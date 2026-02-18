@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Golden Kulcha</title>
+  <link rel="icon" href="IMAGE/gold.jpeg" type="image/jpeg" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #d4af37;
+      --gold-bright: #f2d06b;
+      --black: #0b0b0b;
+      --black-soft: #141414;
+      --white: #f7f4ef;
+      --overlay: rgba(0, 0, 0, 0.78);
+      --card: rgba(10, 10, 10, 0.62);
+      --glow: rgba(212, 175, 55, 0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Montserrat", system-ui, -apple-system, Segoe UI, sans-serif;
+      color: var(--white);
+      background: #000;
+      min-height: 100vh;
+    }
+
+    .page {
+      position: relative;
+      min-height: 100vh;
+      background: url("IMAGE/BACK.jpeg") center / cover fixed no-repeat;
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--overlay);
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      padding: 36px 24px 8px;
+      text-align: center;
+    }
+
+    .brand {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      letter-spacing: 1px;
+      color: var(--gold-bright);
+      margin: 0 0 8px;
+    }
+
+    .tagline {
+      max-width: 720px;
+      margin: 0 auto;
+      font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+      color: #f3eddc;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      padding: 24px 24px 52px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      border-radius: 14px;
+      padding: 20px;
+      min-height: 220px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+    }
+
+    .card h2 {
+      font-family: "Playfair Display", serif;
+      margin: 0 0 8px;
+      font-size: 1.35rem;
+      color: var(--gold-bright);
+    }
+
+    .card p {
+      margin: 0 0 18px;
+      line-height: 1.6;
+      color: #efe8d6;
+    }
+
+    .action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 20px;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      text-decoration: none;
+      color: var(--black);
+      background: linear-gradient(120deg, var(--gold), var(--gold-bright), var(--gold));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 0 0 var(--glow);
+      animation: pulse 2.8s infinite;
+      transition: transform 0.2s ease;
+    }
+
+    .action::after {
+      content: "";
+      position: absolute;
+      inset: -30% 0;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+      transform: translateX(-120%);
+      animation: shimmer 3.4s infinite;
+    }
+
+    .action:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .feedback {
+      display: grid;
+      gap: 14px;
+    }
+
+    .stars {
+      display: flex;
+      gap: 6px;
+      font-size: 1.5rem;
+    }
+
+    .star {
+      cursor: pointer;
+      color: rgba(212, 175, 55, 0.35);
+      transition: transform 0.15s ease, color 0.2s ease;
+    }
+
+    .star.active {
+      color: var(--gold-bright);
+      text-shadow: 0 0 12px rgba(212, 175, 55, 0.7);
+      transform: translateY(-2px) scale(1.05);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      border-radius: 10px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      background: rgba(8, 8, 8, 0.55);
+      color: var(--white);
+      padding: 12px;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    textarea::placeholder {
+      color: rgba(243, 237, 220, 0.7);
+    }
+
+    .submit {
+      width: 100%;
+      border: none;
+      cursor: pointer;
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 0 24px 26px;
+      color: rgba(243, 237, 220, 0.75);
+      font-size: 0.9rem;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 var(--glow);
+      }
+      70% {
+        box-shadow: 0 0 0 18px rgba(212, 175, 55, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-120%);
+      }
+      60% {
+        transform: translateX(120%);
+      }
+      100% {
+        transform: translateX(120%);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: unset;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1 class="brand">Golden Kulcha</h1>
+      <p class="tagline">
+        Minimal. Golden. Freshly baked. Follow us, find us, and leave a quick note.
+      </p>
+    </header>
+
+    <main class="grid">
+      <section class="card">
+        <h2>Instagram</h2>
+        <p>New drops, stories, and golden moments.</p>
+        <a class="action" href="https://www.instagram.com/golden_kulchaco?igsh=cXY4YjQyN2Zscm53" target="_blank" rel="noopener">Visit Instagram</a>
+      </section>
+
+      <section class="card">
+        <h2>Google Maps</h2>
+        <p>Find us fast. Warm kulchas await.</p>
+        <a class="action" href="https://maps.app.goo.gl/x2dqy2YkomuhZpj86?g_st=aw" target="_blank" rel="noopener">Open Maps</a>
+      </section>
+
+      <section class="card">
+        <h2>Feedback</h2>
+        <div class="feedback">
+          <div class="stars" role="radiogroup" aria-label="Rating">
+            <span class="star" data-value="1" aria-label="1 star" role="radio" aria-checked="false">&#9733;</span>
+            <span class="star" data-value="2" aria-label="2 stars" role="radio" aria-checked="false">&#9733;</span>
+            <span class="star" data-value="3" aria-label="3 stars" role="radio" aria-checked="false">&#9733;</span>
+            <span class="star" data-value="4" aria-label="4 stars" role="radio" aria-checked="false">&#9733;</span>
+            <span class="star" data-value="5" aria-label="5 stars" role="radio" aria-checked="false">&#9733;</span>
+          </div>
+          <textarea id="feedback" placeholder="Tell us how we made your day..."></textarea>
+          <button class="action submit" id="sendFeedback" type="button">Send on WhatsApp</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>Golden Kulcha - Crafted fresh, served warm.</footer>
+  </div>
+
+  <script>
+    const stars = document.querySelectorAll(".star");
+    const feedbackInput = document.getElementById("feedback");
+    const sendButton = document.getElementById("sendFeedback");
+    let currentRating = 0;
+
+    const updateStars = (rating) => {
+      stars.forEach((star, index) => {
+        const active = index < rating;
+        star.classList.toggle("active", active);
+        star.setAttribute("aria-checked", active ? "true" : "false");
+      });
+    };
+
+    stars.forEach((star) => {
+      star.addEventListener("click", () => {
+        currentRating = Number(star.dataset.value);
+        updateStars(currentRating);
+      });
+    });
+
+    sendButton.addEventListener("click", () => {
+      const message = [
+        "Golden Kulcha Feedback",
+        `Rating: ${currentRating || "Not selected"} / 5`,
+        `Message: ${feedbackInput.value.trim() || "No feedback shared"}`
+      ].join("%0A");
+
+      const url = `https://wa.me/8459299447?text=${message}`;
+      window.open(url, "_blank");
+    });
+  </script>
+</body>
+</html>
