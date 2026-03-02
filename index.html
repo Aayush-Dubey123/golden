@@ -496,7 +496,6 @@
       const ratingStars = currentRating > 0 ? "★".repeat(currentRating) + "☆".repeat(5 - currentRating) : "No rating";
       const message = [
         "Golden Kulcha Feedback",
-        `Rating: ${ratingStars}`,
         `Message: ${feedbackInput.value.trim() || "No feedback shared"}`
       ].join("%0A");
 
