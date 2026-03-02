@@ -6,6 +6,7 @@
   <title>Golden Kulcha</title>
   <link rel="icon" href="IMAGE/gold.jpeg" type="image/jpeg" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+  <script defer src="https://cdn.vercel-analytics.com/v1/script.js"></script>
   <style>
     :root {
       --gold: #d4af37;
@@ -135,6 +136,44 @@
     }
 
     .feedback {
+      display: grid;
+      gap: 14px;
+    }
+
+    .feedback-toggle {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      color: var(--black);
+      background: linear-gradient(120deg, var(--gold), var(--gold-bright), var(--gold));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .feedback-toggle:hover {
+      transform: translateY(-2px);
+    }
+
+    .feedback-form {
+      display: none;
+      grid-template-rows: 0fr;
+      overflow: hidden;
+      transition: grid-template-rows 0.4s ease;
+    }
+
+    .feedback-form.expanded {
+      display: grid;
+      grid-template-rows: 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .feedback-form-inner {
+      overflow: hidden;
       display: grid;
       gap: 14px;
     }
@@ -315,34 +354,33 @@
 
     <main class="grid">
       <section class="card">
-        <h2>Instagram</h2>
+        <h2>Review Us </h2>
+        <p>Find us fast. Warm kulchas await.</p>
+        <a class="action" href="https://g.page/r/CWx13L0xz2NREBM/review" target="_blank" rel="noopener">Open Google</a>
+      </section>
+
+      <section class="card">
+        <h2>Follow Us On Instagram</h2>
         <p>New drops, stories, and golden moments.</p>
         <a class="action" href="https://www.instagram.com/golden_kulchaco?igsh=cXY4YjQyN2Zscm53" target="_blank" rel="noopener">Visit Instagram</a>
       </section>
 
       <section class="card">
-        <h2>Google Maps</h2>
-        <p>Review us , Find us fast. Warm kulchas await.</p>
-        <a class="action" href="https://g.page/r/CWx13L0xz2NREBM/review" target="_blank" rel="noopener">Open Maps</a>
-      </section>
-
-      <section class="card">
-        <h2>Feedback</h2>
-        <div class="feedback">
-          <div class="stars" role="radiogroup" aria-label="Rating">
-            <span class="star" data-value="1" aria-label="1 star" role="radio" aria-checked="false">&#9733;</span>
-            <span class="star" data-value="2" aria-label="2 stars" role="radio" aria-checked="false">&#9733;</span>
-            <span class="star" data-value="3" aria-label="3 stars" role="radio" aria-checked="false">&#9733;</span>
-            <span class="star" data-value="4" aria-label="4 stars" role="radio" aria-checked="false">&#9733;</span>
-            <span class="star" data-value="5" aria-label="5 stars" role="radio" aria-checked="false">&#9733;</span>
+        <h2>Any Suggestions?</h2>
+        <p>Got ideas to make us better? Unlock The Feedback Section</p>
+        <button class="feedback-toggle" id="feedbackToggle" type="button">
+          💡 Click to Open
+        </button>
+        <div class="feedback-form" id="feedbackForm">
+          <div class="feedback-form-inner">
+            <textarea id="feedback" placeholder="Drop Your Suggestions On whatsapp. We are happy to serve You."></textarea>
+            <button class="action submit" id="sendFeedback" type="button">Send on WhatsApp</button>
           </div>
-          <textarea id="feedback" placeholder="Tell us how we made your day..."></textarea>
-          <button class="action submit" id="sendFeedback" type="button">Send on WhatsApp</button>
         </div>
       </section>
     </main>
 
-    <footer>Golden Kulcha - Crafted fresh, served warm.</footer>
+    <footer>Visit Us Again . Thank You!</footer>
     <div class="review-bubble" id="reviewBubble">
       <p class="review-bubble-name" id="reviewName"></p>
       <p class="review-bubble-text" id="reviewText"></p>
@@ -419,10 +457,25 @@
     });
 
     // ===== Feedback System =====
+    const feedbackToggle = document.getElementById("feedbackToggle");
+    const feedbackForm = document.getElementById("feedbackForm");
     const stars = document.querySelectorAll(".star");
     const feedbackInput = document.getElementById("feedback");
     const sendButton = document.getElementById("sendFeedback");
     let currentRating = 0;
+    let isFormOpen = false;
+
+    // Toggle feedback form
+    feedbackToggle.addEventListener("click", () => {
+      isFormOpen = !isFormOpen;
+      if (isFormOpen) {
+        feedbackForm.classList.add("expanded");
+        feedbackToggle.textContent = "✖ Close Feedback";
+      } else {
+        feedbackForm.classList.remove("expanded");
+        feedbackToggle.textContent = "💡 Share Your Feedback";
+      }
+    });
 
     const updateStars = (rating) => {
       stars.forEach((star, index) => {
