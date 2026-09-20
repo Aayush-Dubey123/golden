@@ -1,0 +1,121 @@
+# Golden Kulcha 🫓✨
+
+> **Minimal. Golden. Freshly baked.**  
+> A full-stack food ordering web application built with a React 19 frontend and a FastAPI backend powered by MongoDB.
+
+---
+
+## 🌟 Key Features
+
+- 🫓 **Public Landing & Menu Page (`/`):** Opens directly to a rich, dark-golden menu catalog without requiring upfront customer login.
+- 🛒 **Unauthenticated Cart System:** Select products (Amritsari Chole Kulcha, Paneer Special, Cheese Burst, Sweet Lassi), adjust quantities, and persist cart state locally.
+- 🔐 **Checkout Authentication Gate:** Frictionless customer journey — customers browse freely and are prompted to sign in or register only when confirming order placement.
+- 📦 **Order Management & Persistence:** Orders are created, stored, and managed in MongoDB via FastAPI REST endpoints (`POST /v1/orders`).
+- ⭐ **Ratings & Reviews:** Customers can rate completed orders with 1–5 stars and submit detailed feedback (`POST /v1/orders/{id}/rate`).
+- 💬 **Google & WhatsApp Integration:** Direct Google Reviews link, Instagram updates (`@golden_kulchaco`), and WhatsApp feedback modal.
+- 🎨 **Luxury Dark-Gold Aesthetic:** Unified theme featuring gold typography (`#d4af37`, `#f2d06b`), glassmorphism cards (`#0a0a0a`), Playfair Display & Montserrat fonts, and background texture overlays.
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Framework:** React 19 + Vite
+- **Styling:** Tailwind CSS + Google Fonts (`Playfair Display`, `Montserrat`)
+- **State & Routing:** React Router 7 + Context API (Cart & Auth)
+- **Icons & UI:** Lucide React + Sonner (Toasts)
+
+### Backend
+- **Framework:** FastAPI (Python)
+- **Database:** MongoDB via ODMantic & Motor (Async MongoDB Driver)
+- **Authentication:** JWT (JSON Web Tokens) & native bcrypt password encryption
+- **ASGI Server:** Uvicorn
+
+---
+
+## 📁 Repository Structure
+
+```text
+golden/
+├── core/                       # FastAPI Backend
+│   ├── apis/                   # Application assembly & routes (user_router, order_router)
+│   ├── controllers/            # Controller business logic (UserController, OrderController)
+│   ├── cruds/                  # Database CRUD queries (UserCRUD, OrderCRUD)
+│   ├── database/               # MongoDB client & ODMantic engine connection
+│   └── model/                  # Data models (User, Order, FoodType, OrderStatus)
+│
+├── frontend/                   # React 19 + Vite Frontend
+│   ├── src/
+│   │   ├── api/                # Axios instance & API services (authApi, orderApi)
+│   │   ├── components/         # Layout, Navbar, Sidebar, RatingStars, Loader
+│   │   ├── context/            # AuthContext & CartContext
+│   │   └── pages/              # GoldenLandingPage, CreateOrder, MyOrders, OrderDetails, Auth
+│   └── public/IMAGE/           # Background textures & brand logos
+│
+├── common/                     # Shared backend utilities (auth, logger)
+└── main.py                     # Backend entry point (Uvicorn ASGI launcher)
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18+) & npm
+- Python (v3.10+)
+- MongoDB running locally on `mongodb://localhost:27017` (or MongoDB Atlas)
+
+---
+
+### 1. Backend Setup
+
+1. **Configure Environment Variables:**
+   Create a `.env` file in the root directory:
+   ```env
+   MONGODB_URL=mongodb://localhost:27017
+   DATABASE_NAME=golden
+   SECRET_KEY=your_super_secret_jwt_key
+   ALGORITHM=HS256
+   ```
+
+2. **Install Python Dependencies:**
+   ```powershell
+   pip install -r requirements.txt
+   ```
+
+3. **Start the FastAPI Backend:**
+   ```powershell
+   python main.py
+   ```
+   *FastAPI server runs on `http://localhost:8000`*  
+   *Interactive API documentation available at `http://localhost:8000/documentation`*
+
+---
+
+### 2. Frontend Setup
+
+1. **Navigate to Frontend Directory & Configure `.env`:**
+   ```powershell
+   cd frontend
+   ```
+   Create `frontend/.env`:
+   ```env
+   VITE_API_BASE_URL=http://127.0.0.1:8000/v1
+   ```
+
+2. **Install Node Dependencies:**
+   ```powershell
+   npm install
+   ```
+
+3. **Start Frontend Dev Server:**
+   ```powershell
+   npm run dev
+   ```
+   *Frontend application runs on `http://localhost:5173`*
+
+---
+
+## 📜 License
+
+This project is open-source and available under the [MIT License](LICENSE).

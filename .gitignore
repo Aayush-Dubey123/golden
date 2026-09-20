@@ -7,8 +7,6 @@ frontend/.env*
 
 # Ignored Root Files
 PRODUCT.md
-Readme.md
-README.md
 __init__.py
 index.html
 main.py
