@@ -5,6 +5,18 @@
 frontend/.env
 frontend/.env*
 
+# Ignored Root Files
+PRODUCT.md
+Readme.md
+README.md
+__init__.py
+index.html
+main.py
+package-lock.json
+package.json
+requirements.txt
+skills-lock.json
+
 # Node dependencies & builds
 node_modules/
 frontend/node_modules/
