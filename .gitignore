@@ -1,0 +1,29 @@
+# Environment files & Secrets
+.env
+.env*
+*.env
+frontend/.env
+frontend/.env*
+
+# Node dependencies & builds
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+dist-ssr/
+
+# Python cache & virtualenv
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Agents & logs
+.agents/
+logs/
+*.log
+
+# OS & Editor
+.DS_Store
+.vscode/
+.idea/
