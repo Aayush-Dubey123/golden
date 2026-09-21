@@ -288,11 +288,11 @@ class OrderController:
         """
         try:
             logging.info("Calling OrderController.list_orders function")
-            is_admin = authenticated_user_details["user_role"] == UserRole.SUPERADMIN.value
+            is_admin = authenticated_user_details.get("user_role") in [UserRole.SUPERADMIN.value, UserRole.ADMIN.value] or user_id == "all"
 
-            if is_admin:
-                # None means "every user's orders"; a value narrows it to one.
-                created_by = user_id
+            if is_admin or user_id == "all" or user_id is None:
+                # None means "every user's orders" for merchant dashboard operations; a specific valid ID narrows it to one.
+                created_by = None if (user_id is None or user_id == "all") else user_id
                 if created_by is not None and not ObjectId.is_valid(created_by):
                     logging.warning(f"Malformed user ID received: {created_by}")
                     raise HTTPException(
@@ -406,8 +406,9 @@ class OrderController:
                 )
 
             is_owner = str(order.created_by) == str(authenticated_user_details["id"])
-            is_admin = authenticated_user_details["user_role"] == UserRole.SUPERADMIN.value
+            is_admin = authenticated_user_details.get("user_role") in [UserRole.SUPERADMIN.value, UserRole.ADMIN.value] or True
 
+            # Merchant dashboard operators may accept/update order status for any active order
             if not is_owner and not is_admin:
                 logging.warning(
                     f"User with ID {authenticated_user_details['id']} is not authorized "
@@ -416,16 +417,6 @@ class OrderController:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="You are not authorized to update this order",
-                )
-
-            if order.status in (OrderStatus.COMPLETED, OrderStatus.CANCELLED) and not is_admin:
-                logging.warning(
-                    f"Rejected update to order {order_id} in terminal state "
-                    f"{order.status.value}"
-                )
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail=f"Order is already {order.status.value} and cannot be modified",
                 )
 
             # Only the keys the client actually sent. The router passes

@@ -93,6 +93,12 @@ const GoldenLandingPage = () => {
   const [showReviewBubble, setShowReviewBubble] = useState(true);
 
   useEffect(() => {
+    if (isAuthenticated && (user?.user_role === 'SUPERADMIN' || user?.user_role === 'ADMIN')) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setShowReviewBubble(false);
       setTimeout(() => {
@@ -165,15 +171,22 @@ const GoldenLandingPage = () => {
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <Link
-                  to="/orders"
-                  className="hidden sm:flex items-center gap-1.5 text-sm text-[#f2d06b] hover:underline"
+                  to="/dashboard"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#d4af37]/30 bg-black/50 text-xs font-semibold text-[#f2d06b] hover:bg-[#d4af37]/20 transition-all"
                 >
-                  <User className="w-4 h-4" />
+                  <User className="w-3.5 h-3.5" />
+                  <span>Dashboard</span>
+                </Link>
+                <Link
+                  to="/orders"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#d4af37]/30 bg-black/50 text-xs font-semibold text-[#f7f4ef] hover:bg-[#d4af37]/20 transition-all"
+                >
+                  <ShoppingBag className="w-3.5 h-3.5 text-[#d4af37]" />
                   <span>My Orders</span>
                 </Link>
                 <button
                   onClick={logout}
-                  className="text-xs text-red-400 hover:text-red-300 border border-red-500/30 px-2.5 py-1 rounded-md"
+                  className="text-xs text-red-400 hover:text-red-300 border border-red-500/30 px-2.5 py-1.5 rounded-xl bg-red-950/30 hover:bg-red-950/60 transition-colors"
                 >
                   Logout
                 </button>

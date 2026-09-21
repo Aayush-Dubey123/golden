@@ -6,13 +6,18 @@ export const orderApi = {
     return response.data;
   },
   
-  getOrders: async () => {
-    const response = await api.get('/orders');
+  getOrders: async (params = {}) => {
+    const response = await api.get('/orders', { params });
     return response.data;
   },
   
   getOrderById: async (id) => {
     const response = await api.get(`/orders/${id}`);
+    return response.data;
+  },
+  
+  updateOrder: async (id, updateData) => {
+    const response = await api.put(`/orders/${id}`, updateData);
     return response.data;
   },
   

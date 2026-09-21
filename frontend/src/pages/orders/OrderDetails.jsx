@@ -58,10 +58,11 @@ const OrderDetails = () => {
             </div>
             <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
               order.status === 'COMPLETED' ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-500/40' : 
+              order.status === 'ACCEPTED' ? 'bg-amber-950/80 text-amber-400 border border-amber-500/40' :
               order.status === 'CANCELLED' ? 'bg-red-950/80 text-red-400 border border-red-500/40' :
-              'bg-amber-950/80 text-amber-400 border border-amber-500/40'
+              'bg-red-950/70 text-red-300 border border-red-500/30'
             }`}>
-              {order.status}
+              {order.status === 'ACCEPTED' ? '👨‍🍳 Kitchen Preparing' : order.status === 'IN_PROGRESS' ? '⏳ Pending Merchant Acceptance' : order.status}
             </span>
           </div>
         </div>

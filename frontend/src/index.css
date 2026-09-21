@@ -17,18 +17,50 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 font-semibold text-sm transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 font-semibold text-sm transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer;
   }
   .btn-primary {
-    @apply bg-gradient-to-r from-[#d4af37] via-[#f2d06b] to-[#d4af37] text-black font-bold shadow-md hover:scale-[1.02] border-none;
+    @apply bg-gradient-to-r from-[#d4af37] via-[#f2d06b] to-[#d4af37] text-black font-bold shadow-md hover:scale-[1.02] border-none active:scale-[0.98];
   }
   .btn-outline {
-    @apply border border-[#d4af37]/40 bg-black/40 text-[#f2d06b] hover:bg-[#d4af37]/20;
+    @apply border border-[#d4af37]/40 bg-black/40 text-[#f2d06b] hover:bg-[#d4af37]/20 active:scale-[0.98];
   }
   .input {
-    @apply flex h-11 w-full rounded-xl border border-[#d4af37]/30 bg-black/60 px-3.5 py-2 text-sm text-[#f7f4ef] placeholder:text-[#b3a894]/60 focus:outline-none focus:border-[#f2d06b] focus:ring-1 focus:ring-[#f2d06b] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply flex h-11 w-full rounded-xl border border-[#d4af37]/30 bg-black/70 px-3.5 py-2 text-sm text-[#f7f4ef] placeholder:text-[#b3a894]/60 focus:outline-none focus:border-[#f2d06b] focus:ring-1 focus:ring-[#f2d06b] disabled:cursor-not-allowed disabled:opacity-50 transition-all;
   }
   .card {
-    @apply rounded-2xl border border-[#d4af37]/25 bg-[#0a0a0a]/80 backdrop-blur-md shadow-2xl overflow-hidden text-[#f7f4ef];
+    @apply rounded-2xl border border-[#d4af37]/25 bg-[#0a0a0a]/85 backdrop-blur-md shadow-2xl overflow-hidden text-[#f7f4ef];
   }
 }
+
+/* Smooth Page & Component Transitions */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-page-entry {
+  animation: pageFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

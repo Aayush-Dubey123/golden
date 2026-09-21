@@ -7,23 +7,39 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('golden_kulcha_user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     const token = getToken();
     if (token) {
       setIsAuthenticated(true);
-      // We could parse JWT here to get user info if needed
+    } else {
+      setIsAuthenticated(false);
+      setUser(null);
     }
     setLoading(false);
   }, []);
 
   const login = async (credentials) => {
     const data = await authApi.login(credentials);
-    if (data.access_token) {
-      saveToken(data.access_token);
+    if (data.access_token || data.data?.access_token) {
+      const token = data.access_token || data.data.access_token;
+      saveToken(token);
       setIsAuthenticated(true);
-      setUser(data.data);
+      const userData = data.data || {};
+      setUser(userData);
+      try {
+        localStorage.setItem('golden_kulcha_user', JSON.stringify(userData));
+      } catch (e) {
+        console.error('Failed to save user in localStorage', e);
+      }
     }
     return data;
   };
@@ -33,13 +49,24 @@ export const AuthProvider = ({ children }) => {
     if (data.data?.access_token) {
       saveToken(data.data.access_token);
       setIsAuthenticated(true);
-      setUser(data.data);
+      const uData = data.data;
+      setUser(uData);
+      try {
+        localStorage.setItem('golden_kulcha_user', JSON.stringify(uData));
+      } catch (e) {
+        console.error('Failed to save user in localStorage', e);
+      }
     }
     return data;
   };
 
   const logout = () => {
     removeToken();
+    try {
+      localStorage.removeItem('golden_kulcha_user');
+    } catch (e) {
+      console.error(e);
+    }
     setIsAuthenticated(false);
     setUser(null);
   };

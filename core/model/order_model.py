@@ -45,13 +45,14 @@ class OrderStatus(str, Enum):
     Current state of an order.
 
     Attributes:
-        IN_PROGRESS: Order has been placed and is being prepared. The state
-            every new order starts in.
+        IN_PROGRESS: Order has been placed by user, pending merchant acceptance.
+        ACCEPTED: Order has been accepted by restaurant and is being prepared.
         COMPLETED: Order has been fulfilled and closed.
-        CANCELLED: Order has been cancelled by the user or by staff.
+        CANCELLED: Order has been cancelled.
     """
 
     IN_PROGRESS = "IN_PROGRESS"
+    ACCEPTED = "ACCEPTED"
     COMPLETED = "COMPLETED"
     CANCELLED = "CANCELLED"
 

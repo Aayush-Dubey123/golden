@@ -16,9 +16,15 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      await login(data);
+      const res = await login(data);
+      const userRole = res?.data?.user_role;
       toast.success('Logged in successfully');
-      navigate(redirectTarget);
+
+      if (userRole === 'SUPERADMIN' || userRole === 'ADMIN') {
+        navigate('/dashboard');
+      } else {
+        navigate(redirectTarget);
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to login. Check credentials.');
     }
@@ -33,7 +39,13 @@ const Login = () => {
       />
       <div className="fixed inset-0 z-0 bg-[#0b0b0b]/85 pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-md rounded-2xl bg-[#0a0a0a]/85 border border-[#d4af37]/30 backdrop-blur-md p-8 shadow-2xl">
+      <div className="relative z-10 w-full max-w-md rounded-2xl bg-[#0a0a0a]/90 border border-[#d4af37]/40 backdrop-blur-md p-8 shadow-2xl">
+        {redirectTarget.includes('create-order') && (
+          <div className="mb-6 rounded-xl border border-[#d4af37]/40 bg-[#d4af37]/15 p-3 text-center text-xs text-[#f2d06b] font-semibold flex items-center justify-center gap-2">
+            <span>🛒 Sign in to complete your order. Your cart is saved!</span>
+          </div>
+        )}
+
         <div className="mb-8 flex flex-col items-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#d4af37]/20 border border-[#d4af37]/40 text-[#f2d06b]">
             <LogIn className="h-7 w-7" />

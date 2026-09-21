@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import PageTransition from './components/PageTransition';
 import { CartProvider } from './context/CartContext';
 
 // Pages
@@ -31,19 +32,19 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           {/* Public Landing & Ordering Page */}
-          <Route path="/" element={<GoldenLandingPage />} />
+          <Route path="/" element={<PageTransition><GoldenLandingPage /></PageTransition>} />
 
           {/* Auth Pages */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+          <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
 
           {/* Protected Customer Routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/create-order" element={<CreateOrder />} />
-              <Route path="/orders" element={<MyOrders />} />
-              <Route path="/orders/:id" element={<OrderDetails />} />
+              <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
+              <Route path="/create-order" element={<PageTransition><CreateOrder /></PageTransition>} />
+              <Route path="/orders" element={<PageTransition><MyOrders /></PageTransition>} />
+              <Route path="/orders/:id" element={<PageTransition><OrderDetails /></PageTransition>} />
             </Route>
           </Route>
 

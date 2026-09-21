@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { orderApi } from '../../api/orderApi';
+import { useAuth } from '../../hooks/useAuth';
 import { format } from 'date-fns';
 import { ChevronRight, Star } from 'lucide-react';
 import Loader from '../../components/Loader';
 
 const MyOrders = () => {
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.user_role === 'SUPERADMIN' || user?.user_role === 'ADMIN') {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -68,10 +76,11 @@ const MyOrders = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${
                         order.status === 'COMPLETED' ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-500/40' : 
+                        order.status === 'ACCEPTED' ? 'bg-amber-950/80 text-amber-400 border border-amber-500/40' :
                         order.status === 'CANCELLED' ? 'bg-red-950/80 text-red-400 border border-red-500/40' :
-                        'bg-amber-950/80 text-amber-400 border border-amber-500/40'
+                        'bg-red-950/60 text-red-300 border border-red-500/30'
                       }`}>
-                        {order.status}
+                        {order.status === 'ACCEPTED' ? '👨‍🍳 Kitchen Preparing' : order.status === 'IN_PROGRESS' ? '⏳ Pending Acceptance' : order.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
