@@ -17,7 +17,7 @@ const Navbar = () => {
         {isAdmin ? (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-emerald-500/40 bg-emerald-950/40 text-xs font-bold text-emerald-400">
             <Store className="w-4 h-4 text-emerald-400" />
-            <span>Zomato Merchant Terminal</span>
+            <span>Merchant Terminal</span>
           </div>
         ) : (
           <Link 

@@ -18,7 +18,7 @@ const Sidebar = () => {
   ];
 
   const adminNavItems = [
-    { name: 'Zomato Merchant Terminal', path: '/dashboard', icon: Store, badge: 'LIVE' },
+    { name: 'Merchant Terminal', path: '/dashboard', icon: Store, badge: 'LIVE' },
   ];
 
   const navItems = isAdmin ? adminNavItems : customerNavItems;

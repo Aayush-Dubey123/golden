@@ -39,12 +39,12 @@ const Dashboard = () => {
     try {
       if (!isSilent) setLoading(true);
       const data = await orderApi.getOrders();
-      const list = data?.data?.list || [];
+      const list = Array.isArray(data?.data) ? data.data : (data?.data?.list || []);
       
       const newPendingCount = list.filter(o => o.status === 'IN_PROGRESS').length;
 
       // Audio notification if new orders land
-      if (newPendingCount > prevPendingCount.current && soundEnabled && !isSilent) {
+      if (newPendingCount > prevPendingCount.current && soundEnabled) {
         toast.info('🔔 NEW INCOMING ORDER ARRIVED!', {
           description: 'Check Zomato Business Terminal to accept the order.',
           duration: 6000
@@ -96,7 +96,17 @@ const Dashboard = () => {
   const completedOrders = orders.filter(o => o.status === 'COMPLETED');
   const cancelledOrders = orders.filter(o => o.status === 'CANCELLED');
 
-  const totalRevenue = completedOrders.reduce((sum, o) => sum + (o.quantity * 160), 0); // Estimated revenue calculation
+  const getPriceForOrder = (order) => {
+    if (order.price) return parseFloat(order.price);
+    if (order.food_item?.includes('Paneer')) return 160;
+    if (order.food_item?.includes('Cheese')) return 180;
+    if (order.food_item?.includes('Garlic')) return 140;
+    if (order.food_item?.includes('Lassi')) return 60;
+    if (order.food_item?.includes('Extra')) return 50;
+    return 120;
+  };
+
+  const totalRevenue = completedOrders.reduce((sum, o) => sum + (o.quantity * getPriceForOrder(o)), 0);
 
   const filteredOrders = activeTab === 'ALL' ? orders :
     activeTab === 'IN_PROGRESS' ? pendingOrders :
@@ -351,14 +361,14 @@ const Dashboard = () => {
                   {/* Customer Info */}
                   <div className="mb-4 rounded-xl bg-black/60 p-3.5 border border-[#d4af37]/20 space-y-1.5 text-xs text-[#b3a894]">
                     <div className="flex items-center justify-between text-[#f7f4ef]">
-                      <span className="font-bold text-sm text-[#f2d06b]">{user?.first_name || 'Customer'}</span>
+                      <span className="font-bold text-sm text-[#f2d06b]">{order.customer_name || user?.first_name || 'Customer'}</span>
                       <span className="flex items-center gap-1 text-[11px]">
-                        <Phone className="w-3 h-3 text-[#d4af37]" /> +91 9876543210
+                        <Phone className="w-3 h-3 text-[#d4af37]" /> {order.customer_phone || '+91 9876543210'}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-[#d4af37] shrink-0" />
-                      <span className="truncate">Main Street, Golden Kulcha Delivery Zone</span>
+                      <span className="truncate">{order.customer_address || 'Main Street, Golden Kulcha Delivery Zone'}</span>
                     </div>
                   </div>
 

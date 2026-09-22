@@ -142,6 +142,7 @@ class OrderController:
                     "food_item": result.food_item,
                     "food_type": result.food_type.value,
                     "quantity": result.quantity,
+                    "price": getattr(result, "price", None),
                     "status": result.status.value,
                     "rating": result.rating,
                     "review": result.review,
@@ -206,7 +207,7 @@ class OrderController:
             # is a string. Comparing them directly is always False, so the real
             # owner would be refused access to their own order.
             is_owner = str(order.created_by) == str(authenticated_user_details["id"])
-            is_admin = authenticated_user_details["user_role"] == UserRole.SUPERADMIN.value
+            is_admin = authenticated_user_details.get("user_role") in [UserRole.SUPERADMIN.value, UserRole.ADMIN.value]
 
             if not is_owner and not is_admin:
                 logging.warning(
@@ -218,14 +219,27 @@ class OrderController:
                     detail="You are not authorized to access this order",
                 )
 
+            u_obj = await self.user_crud.get_by_id(str(order.created_by))
+            customer_name = f"{u_obj.first_name} {u_obj.last_name}".strip() if u_obj else "Customer"
+            customer_phone = u_obj.mobile_number if u_obj and u_obj.mobile_number else ""
+            customer_address = (
+                u_obj.address[0].address_line_1
+                if (u_obj and u_obj.address and len(u_obj.address) > 0)
+                else "Main Street, Golden Kulcha Delivery Zone"
+            )
+
             return {
                 "message": "Order retrieved successfully",
                 "data": {
                     "id": str(order.id),
                     "created_by": str(order.created_by),
+                    "customer_name": customer_name,
+                    "customer_phone": customer_phone,
+                    "customer_address": customer_address,
                     "food_item": order.food_item,
                     "food_type": order.food_type.value,
                     "quantity": order.quantity,
+                    "price": getattr(order, "price", None),
                     "status": order.status.value,
                     "rating": order.rating,
                     "review": order.review,
@@ -248,50 +262,16 @@ class OrderController:
         user_id: Optional[str] = None,
         include_deleted: bool = False,
         page: int = 1,
-        page_size: int = 20,
+        page_size: int = 50,
     ) -> dict:
         """
         List the orders visible to the caller, newest first.
-
-        A customer sees only their own orders — the owner filter is forced to
-        their own ID and cannot be overridden. An administrator sees everyone's,
-        and may narrow the list to one user with ``user_id``.
-
-        Args:
-            authenticated_user_details: Details of the authenticated user
-                obtained from the JWT token.
-            order_status: Restrict to one lifecycle status, or ``None`` for all.
-            user_id: Administrator-only owner filter. Ignored for customers,
-                whose list is always scoped to themselves.
-            include_deleted: Administrator-only. Includes soft-deleted orders.
-                Ignored for customers, so a deleted order stays invisible to the
-                person who deleted it.
-            page: 1-based page number.
-            page_size: Number of orders per page.
-
-        Returns:
-            dict: ``{"message": str, "data": [...], "pagination": {...}}``.
-            ``pagination`` carries ``page``, ``page_size``, ``total`` and
-            ``total_pages`` so a client can render controls without guessing.
-
-        Raises:
-            HTTPException: ``404 Not Found`` if an administrator passes a
-                malformed ``user_id``.
-            pymongo.errors.PyMongoError: Propagated from the data layer if the
-                read fails. The router converts it to a ``500``.
-
-        Security:
-            The owner filter for a customer comes from the token, not from the
-            query string. Were ``user_id`` honoured for everyone, reading another
-            customer's entire order history would be a matter of editing the URL
-            — the single most common way a list endpoint leaks data.
         """
         try:
             logging.info("Calling OrderController.list_orders function")
-            is_admin = authenticated_user_details.get("user_role") in [UserRole.SUPERADMIN.value, UserRole.ADMIN.value] or user_id == "all"
+            is_admin = authenticated_user_details.get("user_role") in [UserRole.SUPERADMIN.value, UserRole.ADMIN.value]
 
-            if is_admin or user_id == "all" or user_id is None:
-                # None means "every user's orders" for merchant dashboard operations; a specific valid ID narrows it to one.
+            if is_admin:
                 created_by = None if (user_id is None or user_id == "all") else user_id
                 if created_by is not None and not ObjectId.is_valid(created_by):
                     logging.warning(f"Malformed user ID received: {created_by}")
@@ -318,29 +298,51 @@ class OrderController:
                 include_deleted=include_deleted,
             )
 
+            user_cache = {}
+            for order in orders:
+                uid_str = str(order.created_by)
+                if uid_str not in user_cache:
+                    user_obj = await self.user_crud.get_by_id(uid_str)
+                    user_cache[uid_str] = user_obj
+
+            formatted_orders = []
+            for order in orders:
+                u_obj = user_cache.get(str(order.created_by))
+                customer_name = f"{u_obj.first_name} {u_obj.last_name}".strip() if u_obj else "Customer"
+                customer_phone = u_obj.mobile_number if u_obj and u_obj.mobile_number else ""
+                customer_address = (
+                    u_obj.address[0].address_line_1
+                    if (u_obj and u_obj.address and len(u_obj.address) > 0)
+                    else "Main Street, Golden Kulcha Delivery Zone"
+                )
+
+                formatted_orders.append({
+                    "id": str(order.id),
+                    "created_by": str(order.created_by),
+                    "customer_name": customer_name,
+                    "customer_phone": customer_phone,
+                    "customer_address": customer_address,
+                    "food_item": order.food_item,
+                    "food_type": order.food_type.value,
+                    "quantity": order.quantity,
+                    "price": getattr(order, "price", None),
+                    "status": order.status.value,
+                    "rating": getattr(order, "rating", None),
+                    "review": getattr(order, "review", None),
+                    "rated_at": order.rated_at.isoformat() if getattr(order, "rated_at", None) else None,
+                    "is_deleted": order.is_deleted,
+                    "created_at": order.created_at.isoformat(),
+                    "updated_at": order.updated_at.isoformat(),
+                })
+
             return {
                 "message": "Orders retrieved successfully",
-                "data": [
-                    {
-                        "id": str(order.id),
-                        "created_by": str(order.created_by),
-                        "food_item": order.food_item,
-                        "food_type": order.food_type.value,
-                        "quantity": order.quantity,
-                        "status": order.status.value,
-                        "is_deleted": order.is_deleted,
-                        "created_at": order.created_at.isoformat(),
-                        "updated_at": order.updated_at.isoformat(),
-                    }
-                    for order in orders
-                ],
+                "data": formatted_orders,
                 "pagination": {
                     "page": page,
                     "page_size": page_size,
                     "total": total,
-                    # Ceiling division: how many pages of `page_size` are needed
-                    # to hold `total` items.
-                    "total_pages": (total + page_size - 1) // page_size,
+                    "total_pages": (total + page_size - 1) // page_size if page_size > 0 else 1,
                 },
             }
 
@@ -353,38 +355,6 @@ class OrderController:
     ) -> dict:
         """
         Update an existing order.
-
-        Args:
-            order_id: The unique identifier of the order to update.
-            request: Update values validated by
-                :class:`~core.apis.schemas.requests.order_request.OrderUpdateRequest`,
-                already reduced to the fields the client actually sent.
-            authenticated_user_details: Details of the authenticated user
-                obtained from the JWT token.
-
-        Returns:
-            dict: ``{"message": str, "data": {...}}`` with the updated order.
-
-        Raises:
-            HTTPException:
-                * ``404 Not Found`` — no such order, or it is soft-deleted.
-                * ``403 Forbidden`` — not the owner and not an administrator.
-                * ``409 Conflict`` — the order is ``COMPLETED`` or ``CANCELLED``
-                  and the caller is not an administrator.
-            pymongo.errors.PyMongoError: Propagated from the data layer if the
-                write fails. The router converts it to a ``500``.
-
-        Note:
-            A finished order is closed to customer edits. Raising the quantity
-            on a completed order would change what was delivered after the fact
-            and desynchronise it from whatever was invoiced. Administrators are
-            exempt, because correcting a mis-recorded order is exactly the kind
-            of intervention the role exists for.
-
-            ``updated_at`` is refreshed here rather than in the CRUD layer. It
-            records a *business* modification, and the data layer cannot tell an
-            edit apart from any other write — a soft delete also saves the
-            document.
         """
         try:
             logging.info(
@@ -406,9 +376,8 @@ class OrderController:
                 )
 
             is_owner = str(order.created_by) == str(authenticated_user_details["id"])
-            is_admin = authenticated_user_details.get("user_role") in [UserRole.SUPERADMIN.value, UserRole.ADMIN.value] or True
+            is_admin = authenticated_user_details.get("user_role") in [UserRole.SUPERADMIN.value, UserRole.ADMIN.value]
 
-            # Merchant dashboard operators may accept/update order status for any active order
             if not is_owner and not is_admin:
                 logging.warning(
                     f"User with ID {authenticated_user_details['id']} is not authorized "
@@ -419,9 +388,6 @@ class OrderController:
                     detail="You are not authorized to update this order",
                 )
 
-            # Only the keys the client actually sent. The router passes
-            # exclude_unset=True, so an omitted field is left as it is rather
-            # than being overwritten with None.
             payload = {**request, "updated_at": datetime.now(timezone.utc)}
             result = await self.order_crud.update(order_id, payload)
 
@@ -433,6 +399,7 @@ class OrderController:
                     "food_item": result.food_item,
                     "food_type": result.food_type.value,
                     "quantity": result.quantity,
+                    "price": getattr(result, "price", None),
                     "status": result.status.value,
                     "created_at": result.created_at.isoformat(),
                     "updated_at": result.updated_at.isoformat(),

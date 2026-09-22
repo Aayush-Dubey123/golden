@@ -56,6 +56,7 @@ const CreateOrder = () => {
             food_item: item.name,
             food_type: item.type || 'VEG',
             quantity: parseInt(item.quantity, 10),
+            price: item.price ? parseFloat(item.price) : 160
           });
           if (res?.data) createdOrders.push(res.data);
         }
@@ -65,6 +66,7 @@ const CreateOrder = () => {
           food_item: data.food_item,
           food_type: data.food_type,
           quantity: parseInt(data.quantity, 10),
+          price: 160
         });
         if (res?.data) createdOrders.push(res.data);
       }

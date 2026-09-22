@@ -105,6 +105,9 @@ class Order(Model):
         ..., description="Type of the food item (VEG or NON_VEG)."
     )
     quantity: int = Field(..., description="Number of units ordered.")
+    price: Optional[float] = Field(
+        default=None, description="Unit price of the food item."
+    )
     status: OrderStatus = Field(
         default=OrderStatus.IN_PROGRESS, description="Current status of the order."
     )

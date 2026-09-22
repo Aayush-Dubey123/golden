@@ -22,7 +22,7 @@ const MyOrders = () => {
     const fetchOrders = async () => {
       try {
         const data = await orderApi.getOrders();
-        setOrders(data?.data?.list || []);
+        setOrders(Array.isArray(data?.data) ? data.data : (data?.data?.list || []));
       } catch (error) {
         console.error('Failed to fetch orders');
       } finally {

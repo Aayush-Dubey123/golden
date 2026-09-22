@@ -48,6 +48,7 @@ class OrderCreateRequest(BaseModel):
         ..., description="Type of the food item (VEG or NON_VEG)."
     )
     quantity: int = Field(..., description="Number of units ordered.", gt=0)
+    price: Optional[float] = Field(None, description="Unit price of the food item.")
 
 
 class OrderUpdateRequest(BaseModel):
@@ -82,6 +83,9 @@ class OrderUpdateRequest(BaseModel):
     )
     quantity: Optional[int] = Field(
         None, description="Number of units ordered.", gt=0
+    )
+    price: Optional[float] = Field(
+        None, description="Unit price of the food item."
     )
     status: Optional[OrderStatus] = Field(
         None, description="Lifecycle status of the order."
