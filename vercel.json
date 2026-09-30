@@ -3,14 +3,6 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/health",
-      "destination": "/api/index.py"
-    },
-    {
-      "source": "/v1/(.*)",
-      "destination": "/api/index.py"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
