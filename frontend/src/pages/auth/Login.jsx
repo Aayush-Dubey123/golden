@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { LogIn } from 'lucide-react';
+import { LogIn, UserCheck, Store } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
-  const { login } = useAuth();
+  const { login, demoLogin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [demoLoadingRole, setDemoLoadingRole] = useState(null);
 
   const searchParams = new URLSearchParams(location.search);
   const redirectTarget = searchParams.get('redirect') || '/';
@@ -30,6 +32,29 @@ const Login = () => {
     }
   };
 
+  const handleDemoLogin = async (role) => {
+    setDemoLoadingRole(role);
+    try {
+      const res = await demoLogin(role);
+      const userRole = res?.data?.user_role;
+      toast.success(
+        role === 'MERCHANT'
+          ? '⚡ Signed in as Demo Merchant (Zomato Business Terminal)'
+          : '⚡ Signed in as Demo Customer'
+      );
+
+      if (userRole === 'SUPERADMIN' || userRole === 'ADMIN' || role === 'MERCHANT') {
+        navigate('/dashboard');
+      } else {
+        navigate(redirectTarget);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to initialize demo login.');
+    } finally {
+      setDemoLoadingRole(null);
+    }
+  };
+
   return (
     <div className="relative min-h-screen bg-black text-[#f7f4ef] flex items-center justify-center px-4 py-8">
       {/* Fixed Background Image Overlay */}
@@ -46,17 +71,54 @@ const Login = () => {
           </div>
         )}
 
-        <div className="mb-8 flex flex-col items-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#d4af37]/20 border border-[#d4af37]/40 text-[#f2d06b]">
+        <div className="mb-6 flex flex-col items-center">
+          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#d4af37]/20 border border-[#d4af37]/40 text-[#f2d06b]">
             <LogIn className="h-7 w-7" />
           </div>
           <h2 className="text-2xl font-bold font-serif text-[#f2d06b]">Golden Kulcha Sign In</h2>
-          <p className="text-xs text-[#b3a894] mt-2">Sign in to complete your food order</p>
+          <p className="text-xs text-[#b3a894] mt-1">Sign in to complete your food order or access terminal</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        {/* Portfolio Demo Login Buttons */}
+        <div className="mb-6 rounded-xl border border-[#d4af37]/40 bg-[#d4af37]/10 p-4">
+          <p className="text-[11px] font-bold text-[#f2d06b] mb-2.5 text-center uppercase tracking-wider">
+            ⚡ One-Click Portfolio Demo Access
+          </p>
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => handleDemoLogin('CUSTOMER')}
+              disabled={demoLoadingRole !== null || isSubmitting}
+              className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-[#d4af37]/40 bg-black/70 py-3 px-3 text-xs font-bold text-[#f7f4ef] hover:bg-[#d4af37]/25 hover:border-[#f2d06b] transition-all disabled:opacity-50 active:scale-95 shadow-md"
+            >
+              <UserCheck className="w-5 h-5 text-[#f2d06b]" />
+              <span>{demoLoadingRole === 'CUSTOMER' ? 'Signing in...' : 'Demo Customer'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleDemoLogin('MERCHANT')}
+              disabled={demoLoadingRole !== null || isSubmitting}
+              className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-[#d4af37]/40 bg-black/70 py-3 px-3 text-xs font-bold text-[#f7f4ef] hover:bg-[#d4af37]/25 hover:border-[#f2d06b] transition-all disabled:opacity-50 active:scale-95 shadow-md"
+            >
+              <Store className="w-5 h-5 text-[#f2d06b]" />
+              <span>{demoLoadingRole === 'MERCHANT' ? 'Signing in...' : 'Demo Merchant'}</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="relative mb-6 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-[#d4af37]/20" />
+          </div>
+          <span className="relative bg-[#0a0a0a] px-3 text-[10px] uppercase tracking-widest text-[#b3a894]">
+            Or sign in with standard account
+          </span>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#f7f4ef]">
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#f7f4ef]">
               Username / First Name
             </label>
             <input
@@ -71,7 +133,7 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#f7f4ef]">
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#f7f4ef]">
               Password
             </label>
             <input
@@ -87,14 +149,14 @@ const Login = () => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || demoLoadingRole !== null}
             className="btn btn-primary w-full py-3 text-black font-bold hover:scale-[1.02] transition-transform"
           >
             {isSubmitting ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs text-[#b3a894]">
+        <p className="mt-5 text-center text-xs text-[#b3a894]">
           Don't have an account?{' '}
           <Link 
             to={`/signup${redirectTarget !== '/' ? `?redirect=${encodeURIComponent(redirectTarget)}` : ''}`}
@@ -109,3 +171,4 @@ const Login = () => {
 };
 
 export default Login;
+

@@ -60,6 +60,23 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const demoLogin = async (role) => {
+    const data = await authApi.demoLogin(role);
+    if (data.access_token || data.data?.access_token) {
+      const token = data.access_token || data.data.access_token;
+      saveToken(token);
+      setIsAuthenticated(true);
+      const userData = data.data || {};
+      setUser(userData);
+      try {
+        localStorage.setItem('golden_kulcha_user', JSON.stringify(userData));
+      } catch (e) {
+        console.error('Failed to save user in localStorage', e);
+      }
+    }
+    return data;
+  };
+
   const logout = () => {
     removeToken();
     try {
@@ -72,7 +89,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, user, login, signup, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, user, login, signup, demoLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );

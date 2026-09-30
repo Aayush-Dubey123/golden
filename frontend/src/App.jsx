@@ -38,10 +38,16 @@ const App = () => {
           <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
           <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
 
+          {/* Protected Merchant / Admin Terminal Route */}
+          <Route element={<ProtectedRoute requireAdmin={true} />}>
+            <Route element={<Layout />}>
+              <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
+            </Route>
+          </Route>
+
           {/* Protected Customer Routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
-              <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
               <Route path="/create-order" element={<PageTransition><CreateOrder /></PageTransition>} />
               <Route path="/orders" element={<PageTransition><MyOrders /></PageTransition>} />
               <Route path="/orders/:id" element={<PageTransition><OrderDetails /></PageTransition>} />

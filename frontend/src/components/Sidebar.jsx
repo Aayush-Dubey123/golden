@@ -12,13 +12,13 @@ const Sidebar = () => {
 
   const customerNavItems = [
     { name: 'Public Menu', path: '/', icon: Home },
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Checkout / Order', path: '/create-order', icon: PlusCircle, badge: totalCount > 0 ? totalCount : null },
     { name: 'My Orders', path: '/orders', icon: ShoppingBag },
   ];
 
   const adminNavItems = [
     { name: 'Merchant Terminal', path: '/dashboard', icon: Store, badge: 'LIVE' },
+    { name: 'Public Menu', path: '/', icon: Home },
   ];
 
   const navItems = isAdmin ? adminNavItems : customerNavItems;
