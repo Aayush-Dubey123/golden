@@ -2,21 +2,15 @@
 .env
 .env*
 *.env
-frontend/.env
-frontend/.env*
 
 # Ignored Root Files
 PRODUCT.md
 __init__.py
-index.html
-package-lock.json
 skills-lock.json
 
 # Node dependencies & builds
 node_modules/
-frontend/node_modules/
 dist/
-frontend/dist/
 dist-ssr/
 
 # Python cache & virtualenv

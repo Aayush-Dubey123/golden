@@ -10,6 +10,7 @@
 - 🫓 **Public Landing & Menu Page (`/`):** Opens directly to a rich, dark-golden menu catalog without requiring upfront customer login.
 - 🛒 **Unauthenticated Cart System:** Select products (Amritsari Chole Kulcha, Paneer Special, Cheese Burst, Sweet Lassi), adjust quantities, and persist cart state locally.
 - 🔐 **Checkout Authentication Gate:** Frictionless customer journey — customers browse freely and are prompted to sign in or register only when confirming order placement.
+- ⚡ **One-Click Portfolio Demo Access:** Quick demo login for both **Demo Customer** and **Demo Merchant (Zomato Terminal)**.
 - 📦 **Order Management & Persistence:** Orders are created, stored, and managed in MongoDB via FastAPI REST endpoints (`POST /v1/orders`).
 - ⭐ **Ratings & Reviews:** Customers can rate completed orders with 1–5 stars and submit detailed feedback (`POST /v1/orders/{id}/rate`).
 - 💬 **Google & WhatsApp Integration:** Direct Google Reviews link, Instagram updates (`@golden_kulchaco`), and WhatsApp feedback modal.
@@ -37,23 +38,24 @@
 
 ```text
 golden/
+├── src/                        # React 19 Frontend Code
+│   ├── api/                    # Axios instance & API services (authApi, orderApi)
+│   ├── components/             # Layout, Navbar, Sidebar, ProtectedRoute, Loader
+│   ├── context/                # AuthContext & CartContext
+│   └── pages/                  # GoldenLandingPage, CreateOrder, MyOrders, OrderDetails, Auth, Dashboard
+├── public/                     # Static assets & brand logos
 ├── core/                       # FastAPI Backend
 │   ├── apis/                   # Application assembly & routes (user_router, order_router)
 │   ├── controllers/            # Controller business logic (UserController, OrderController)
 │   ├── cruds/                  # Database CRUD queries (UserCRUD, OrderCRUD)
 │   ├── database/               # MongoDB client & ODMantic engine connection
 │   └── model/                  # Data models (User, Order, FoodType, OrderStatus)
-│
-├── frontend/                   # React 19 + Vite Frontend
-│   ├── src/
-│   │   ├── api/                # Axios instance & API services (authApi, orderApi)
-│   │   ├── components/         # Layout, Navbar, Sidebar, RatingStars, Loader
-│   │   ├── context/            # AuthContext & CartContext
-│   │   └── pages/              # GoldenLandingPage, CreateOrder, MyOrders, OrderDetails, Auth
-│   └── public/IMAGE/           # Background textures & brand logos
-│
 ├── common/                     # Shared backend utilities (auth, logger)
-└── main.py                     # Backend entry point (Uvicorn ASGI launcher)
+├── api/                        # Vercel serverless function entry (index.py)
+├── main.py                     # Local FastAPI entry point (Uvicorn launcher)
+├── package.json                # Root Node dependencies & build scripts
+├── requirements.txt            # Python backend dependencies
+└── vercel.json                 # Vercel deployment configuration
 ```
 
 ---
@@ -67,7 +69,7 @@ golden/
 
 ---
 
-### 1. Backend Setup
+### Setup & Running Locally
 
 1. **Configure Environment Variables:**
    Create a `.env` file in the root directory:
@@ -76,47 +78,29 @@ golden/
    DATABASE_NAME=golden
    SECRET_KEY=your_super_secret_jwt_key
    ALGORITHM=HS256
+   VITE_API_BASE_URL=/v1
    ```
 
-2. **Install Python Dependencies:**
+2. **Install Dependencies:**
    ```powershell
+   # Install Node dependencies
+   npm install
+
+   # Install Python dependencies
    pip install -r requirements.txt
    ```
 
-3. **Start the FastAPI Backend:**
+3. **Start Applications:**
    ```powershell
+   # Start FastAPI Backend (runs on http://127.0.0.1:8000)
    python main.py
-   ```
-   *FastAPI server runs on `http://localhost:8000`*  
-   *Interactive API documentation available at `http://localhost:8000/documentation`*
 
----
-
-### 2. Frontend Setup
-
-1. **Navigate to Frontend Directory & Configure `.env`:**
-   ```powershell
-   cd frontend
-   ```
-   Create `frontend/.env`:
-   ```env
-   VITE_API_BASE_URL=http://127.0.0.1:8000/v1
-   ```
-
-2. **Install Node Dependencies:**
-   ```powershell
-   npm install
-   ```
-
-3. **Start Frontend Dev Server:**
-   ```powershell
+   # Start React Frontend (runs on http://localhost:5173)
    npm run dev
    ```
-   *Frontend application runs on `http://localhost:5173`*
 
 ---
 
 ## 📜 License
 
 This project is open-source and available under the [MIT License](LICENSE).
-
