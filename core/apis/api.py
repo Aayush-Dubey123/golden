@@ -29,127 +29,46 @@ from core.apis.routes.order_router import order_router
 
 #: The ASGI application. Referenced as ``core.apis.api:app`` by the server.
 app = FastAPI(
-    title="SVPCET FastAPI Codebase Tutorial",
-    version="0.1 - Beta",
-    description="Tutorial project showing how to structure a FastAPI codebase.",
+    title="Golden Kulcha API",
+    version="1.0.0",
+    description="Production REST API for Golden Kulcha food ordering platform.",
     redoc_url="/documentation",
 )
 
 
 @app.middleware("http")
 async def add_security_headers(request, call_next):
-    """
-    Attach hardening headers to every outbound response.
-
-    Middleware wraps the entire request cycle, so these headers are applied
-    uniformly — including on error responses, which are easy to miss when
-    headers are set per route.
-
-    Args:
-        request: The incoming request.
-        call_next: Continuation that dispatches to the next middleware or the
-            matched route and returns its response.
-
-    Returns:
-        starlette.responses.Response: The downstream response with security
-        headers added.
-
-    Note:
-        Headers applied and the attack each addresses:
-
-        * ``X-Frame-Options: DENY`` — refuses framing by another origin,
-          defeating clickjacking, where a hostile page overlays an invisible
-          frame of this site so a user's clicks land on it unknowingly.
-        * ``X-Content-Type-Options: nosniff`` — stops the browser from
-          second-guessing a declared content type, which can otherwise turn an
-          uploaded file into executable script.
-        * ``X-XSS-Protection`` — legacy filter toggle, retained for old
-          browsers; superseded by Content-Security-Policy.
-        * ``Strict-Transport-Security`` — pins the origin to HTTPS for a year,
-          closing the window in which an initial plaintext request could be
-          intercepted.
-        * ``Permissions-Policy`` — withholds geolocation and microphone access.
-        * ``Cache-Control: no-store`` — keeps authenticated responses out of
-          browser and proxy caches, where a later user could retrieve them.
-        * ``Server`` — replaces the software banner, since version disclosure
-          tells an attacker which known vulnerabilities to try.
-
-        ``Access-Control-Allow-Methods`` is then set to echo the request's own
-        method. This is illustrative only; the CORS middleware below is what
-        actually governs cross-origin access.
-    """
-    # Dispatch first — headers are applied to the response on its way out.
+    """Attach hardening security headers to outbound responses."""
     response = await call_next(request)
-
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-XSS-Protection"] = "1; mode=block"
-    response.headers["Strict-Transport-Security"] = (
-        "max-age=31536000; includeSubDomains"
-    )
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Permissions-Policy"] = "geolocation=(), microphone=()"
     response.headers["Cache-Control"] = "no-store"
     response.headers["Server"] = "Custom Server"
 
     method = request.method
-
-    if method == "GET":
-        response.headers["Access-Control-Allow-Methods"] = "GET"
-    elif method == "POST":
-        response.headers["Access-Control-Allow-Methods"] = "POST"
-    elif method == "PUT":
-        response.headers["Access-Control-Allow-Methods"] = "PUT"
-    elif method == "DELETE":
-        response.headers["Access-Control-Allow-Methods"] = "DELETE"
+    if method in ["GET", "POST", "PUT", "DELETE"]:
+        response.headers["Access-Control-Allow-Methods"] = method
 
     return response
 
 
-@app.get("/set-cookie")
-def set_cookie(response: Response):
-    """
-    Demonstrate issuing a hardened cookie.
-
-    Args:
-        response: Response object injected by FastAPI, mutated to carry the
-            ``Set-Cookie`` header.
-
-    Returns:
-        None: The response body is empty; the cookie travels in the header.
-
-    Note:
-        The flags are what make a session cookie safe to use:
-
-        * ``httponly`` — hides the value from JavaScript, so injected script
-          cannot read and exfiltrate the session.
-        * ``secure`` — sends it only over HTTPS.
-        * ``samesite="strict"`` — withholds it from cross-site requests,
-          blocking cross-site request forgery.
-        * ``max_age`` — bounds its lifetime to 30 minutes.
-
-    Warning:
-        A demonstration endpoint. Remove it before deploying; it serves no
-        purpose in a real deployment and needlessly widens the API surface.
-    """
-    response.set_cookie(
-        key="session",
-        value="value",
-        httponly=True,
-        secure=True,
-        samesite="strict",
-        max_age=1800,
-    )
 
 
 from core.database.database import connect_to_mongo, close_mongo_connection
+from core.database.seed import seed_demo_data
 
 
 @app.on_event("startup")
 async def startup_db_client():
     try:
         await connect_to_mongo()
+        await seed_demo_data()
     except Exception as e:
-        print(f"MongoDB connection warning on startup: {e}")
+        print(f"MongoDB connection/seeding warning on startup: {e}")
+
 
 
 @app.on_event("shutdown")
@@ -171,13 +90,9 @@ app.include_router(order_router, tags=["Order Management"])
 
 @app.get("/")
 def root():
-    """
-    Return a greeting confirming the application is serving.
+    """Return greeting confirming the Golden Kulcha API is serving."""
+    return {"message": "Welcome to Golden Kulcha API", "status": "healthy"}
 
-    Returns:
-        dict: ``{"message": str}``.
-    """
-    return {"message": "Welcome to the SVPCET FastAPI Codebase Tutorial!"}
 
 
 @app.get("/health")
@@ -221,9 +136,9 @@ def custom_openapi():
         return app.openapi_schema
 
     openapi_schema = get_openapi(
-        title="FastAPI Codebase Tutorial",
-        version="0.1 - Beta",
-        description="Tutorial project showing how to structure a FastAPI codebase.",
+        title="Golden Kulcha API",
+        version="1.0.0",
+        description="Production REST API for Golden Kulcha food ordering platform.",
         routes=app.routes,
     )
 

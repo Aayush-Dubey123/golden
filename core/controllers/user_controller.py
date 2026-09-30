@@ -118,3 +118,55 @@ class UserController:
             logging.error(f"Error in UserController.login_user: {error}")
             raise
 
+    async def demo_login(self, role: str) -> dict:
+        try:
+            logging.info(f"Calling UserController.demo_login for role: {role}")
+            role_normalized = role.strip().upper()
+            if role_normalized not in ["CUSTOMER", "MERCHANT", "USER", "ADMIN"]:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid demo role. Allowed values: 'CUSTOMER' or 'MERCHANT'",
+                )
+
+            is_merchant = role_normalized in ["MERCHANT", "ADMIN"]
+            target_username = "demo_merchant" if is_merchant else "demo_customer"
+
+            user = await self.user_crud.get_by_first_name(target_username)
+            if not user:
+                # Seed demo accounts if not yet created
+                from core.database.seed import seed_demo_data
+                await seed_demo_data()
+                user = await self.user_crud.get_by_first_name(target_username)
+
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Failed to initialize demo account",
+                )
+
+            access_token = signJWT(
+                user_role=user.user_role.value,
+                id=str(user.id),
+                expiry_duration=ACCESS_TOKEN_EXPIRY_SECONDS,
+            )
+
+            return {
+                "message": f"Demo {'merchant' if is_merchant else 'customer'} login successful",
+                "data": {
+                    "id": str(user.id),
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "mobile_number": user.mobile_number,
+                    "user_role": user.user_role.value,
+                    "user_status": user.user_status.value,
+                    "access_token": access_token,
+                },
+            }
+
+        except HTTPException:
+            raise
+        except Exception as error:
+            logging.error(f"Error in UserController.demo_login: {error}")
+            raise
+
+
