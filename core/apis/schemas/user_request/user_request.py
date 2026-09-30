@@ -186,18 +186,3 @@ class UserStatusUpdateRequest(BaseModel):
     user_status: UserStatus = Field(
         ..., description="Account lifecycle state (ACTIVE or INACTIVE)."
     )
-
-
-class DemoLoginRequest(BaseModel):
-    """
-    Payload for ``POST /v1/user/demo-login``.
-
-    Attributes:
-        role: "CUSTOMER" or "MERCHANT"
-    """
-
-    role: str = Field(
-        ...,
-        description="Demo role to log in as ('CUSTOMER' or 'MERCHANT').",
-        examples=["CUSTOMER", "MERCHANT"],
-    )

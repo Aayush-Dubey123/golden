@@ -19,10 +19,4 @@ export const authApi = {
     });
     return response.data;
   },
-
-  demoLogin: async (role) => {
-    const response = await api.post('/user/demo-login', { role });
-    return response.data;
-  },
 };
-

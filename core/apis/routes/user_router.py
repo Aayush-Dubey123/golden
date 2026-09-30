@@ -7,7 +7,6 @@ from common.logger import logger
 from core.apis.schemas.user_request.user_request import (
     UserSignInRequest,
     UserLoginRequest,
-    DemoLoginRequest,
     UserChangePasswordRequest,
     AdminUserUpdateRequest,
     UserStatusUpdateRequest,
@@ -71,33 +70,6 @@ async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Something Went Wrong",
         )
-
-
-@user_router.post("/v1/user/demo-login", status_code=status.HTTP_200_OK)
-async def demo_login(request: DemoLoginRequest):
-    """
-    Portfolio-friendly demo login endpoint supporting:
-    1. Demo Customer (role='CUSTOMER') -> standard authenticated customer flow
-    2. Demo Merchant (role='MERCHANT') -> merchant/admin live dashboard terminal
-    """
-    try:
-        logging.info("Calling /v1/user/demo-login endpoint")
-        result = await UserController().demo_login(request.role)
-        return {
-            "access_token": result["data"]["access_token"],
-            "token_type": "bearer",
-            **result,
-        }
-    except HTTPException as httperror:
-        logging.error(f"Error in /v1/user/demo-login: {httperror}")
-        raise
-    except Exception as error:
-        logging.error(f"Error in /v1/user/demo-login: {error}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Something Went Wrong",
-        )
-
 
 
 @user_router.post("/v1/user/change-password", status_code=status.HTTP_200_OK)

@@ -5,9 +5,15 @@
 frontend/.env
 frontend/.env*
 
-# Local development & build artifacts
+# Ignored Root Files
+PRODUCT.md
+__init__.py
+index.html
+main.py
+package-lock.json
+package.json
+requirements.txt
 skills-lock.json
-
 
 # Node dependencies & builds
 node_modules/

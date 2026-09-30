@@ -1,9 +1,0 @@
-{
-  "name": "golden-kulcha",
-  "private": true,
-  "scripts": {
-    "build": "cd frontend && npm install && npm run build",
-    "dev": "cd frontend && npm run dev",
-    "preview": "cd frontend && npm run preview"
-  }
-}

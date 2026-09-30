@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { LogIn, User, Store, Sparkles } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
-  const { login, demoLogin } = useAuth();
-  const [demoLoadingRole, setDemoLoadingRole] = useState(null);
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,29 +30,6 @@ const Login = () => {
     }
   };
 
-  const handleDemoLogin = async (role) => {
-    setDemoLoadingRole(role);
-    try {
-      const res = await demoLogin(role);
-      const userRole = res?.data?.user_role;
-      toast.success(
-        role === 'MERCHANT'
-          ? '✓ Demo Merchant session active — Terminal loaded'
-          : '✓ Demo Customer session active'
-      );
-
-      if (userRole === 'SUPERADMIN' || userRole === 'ADMIN') {
-        navigate('/dashboard');
-      } else {
-        navigate(redirectTarget);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Demo login failed. Please try again.');
-    } finally {
-      setDemoLoadingRole(null);
-    }
-  };
-
   return (
     <div className="relative min-h-screen bg-black text-[#f7f4ef] flex items-center justify-center px-4 py-8">
       {/* Fixed Background Image Overlay */}
@@ -70,7 +46,7 @@ const Login = () => {
           </div>
         )}
 
-        <div className="mb-6 flex flex-col items-center">
+        <div className="mb-8 flex flex-col items-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#d4af37]/20 border border-[#d4af37]/40 text-[#f2d06b]">
             <LogIn className="h-7 w-7" />
           </div>
@@ -78,62 +54,7 @@ const Login = () => {
           <p className="text-xs text-[#b3a894] mt-2">Sign in to complete your food order</p>
         </div>
 
-        {/* Portfolio Demo Login Area */}
-        <div className="mb-6 rounded-xl border border-[#d4af37]/35 bg-[#141414]/90 p-4 shadow-inner">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#d4af37] flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#f2d06b]" />
-              Portfolio Quick Demo Access
-            </span>
-            <span className="text-[10px] text-[#b3a894] font-medium">1-Click Login</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              id="demo-customer-btn"
-              onClick={() => handleDemoLogin('CUSTOMER')}
-              disabled={Boolean(demoLoadingRole) || isSubmitting}
-              className="flex flex-col items-center justify-center p-3 rounded-xl border border-[#d4af37]/40 bg-[#0a0a0a] hover:bg-[#d4af37]/15 hover:border-[#f2d06b] transition-all text-center group cursor-pointer disabled:opacity-50"
-            >
-              <div className="w-8 h-8 rounded-full bg-[#d4af37]/15 flex items-center justify-center mb-1.5 text-[#f2d06b] group-hover:scale-110 transition-transform">
-                <User className="w-4 h-4" />
-              </div>
-              <span className="text-xs font-bold text-[#f7f4ef]">
-                {demoLoadingRole === 'CUSTOMER' ? 'Signing in...' : 'Demo Customer'}
-              </span>
-              <span className="text-[10px] text-[#b3a894] mt-0.5">Browse, Cart & Order</span>
-            </button>
-
-            <button
-              type="button"
-              id="demo-merchant-btn"
-              onClick={() => handleDemoLogin('MERCHANT')}
-              disabled={Boolean(demoLoadingRole) || isSubmitting}
-              className="flex flex-col items-center justify-center p-3 rounded-xl border border-[#d4af37]/40 bg-[#0a0a0a] hover:bg-[#d4af37]/15 hover:border-[#f2d06b] transition-all text-center group cursor-pointer disabled:opacity-50"
-            >
-              <div className="w-8 h-8 rounded-full bg-[#d4af37]/15 flex items-center justify-center mb-1.5 text-[#f2d06b] group-hover:scale-110 transition-transform">
-                <Store className="w-4 h-4" />
-              </div>
-              <span className="text-xs font-bold text-[#f7f4ef]">
-                {demoLoadingRole === 'MERCHANT' ? 'Signing in...' : 'Demo Merchant'}
-              </span>
-              <span className="text-[10px] text-[#b3a894] mt-0.5">Live Terminal & Orders</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="relative my-6 flex items-center justify-center">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#d4af37]/20" />
-          </div>
-          <span className="relative bg-[#0a0a0a] px-3 text-[11px] uppercase tracking-wider text-[#b3a894]">
-            Or Sign In With Account
-          </span>
-        </div>
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
           <div>
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#f7f4ef]">
               Username / First Name

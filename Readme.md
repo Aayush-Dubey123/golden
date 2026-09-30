@@ -8,14 +8,12 @@
 ## 🌟 Key Features
 
 - 🫓 **Public Landing & Menu Page (`/`):** Opens directly to a rich, dark-golden menu catalog without requiring upfront customer login.
-- 🚀 **1-Click Portfolio Demo Access:** Quick demo login with dedicated **Demo Customer** (browse, cart, checkout) and **Demo Merchant** (live Zomato-style restaurant terminal with real persisted MongoDB orders) options.
 - 🛒 **Unauthenticated Cart System:** Select products (Amritsari Chole Kulcha, Paneer Special, Cheese Burst, Sweet Lassi), adjust quantities, and persist cart state locally.
 - 🔐 **Checkout Authentication Gate:** Frictionless customer journey — customers browse freely and are prompted to sign in or register only when confirming order placement.
 - 📦 **Order Management & Persistence:** Orders are created, stored, and managed in MongoDB via FastAPI REST endpoints (`POST /v1/orders`).
 - ⭐ **Ratings & Reviews:** Customers can rate completed orders with 1–5 stars and submit detailed feedback (`POST /v1/orders/{id}/rate`).
 - 💬 **Google & WhatsApp Integration:** Direct Google Reviews link, Instagram updates (`@golden_kulchaco`), and WhatsApp feedback modal.
 - 🎨 **Luxury Dark-Gold Aesthetic:** Unified theme featuring gold typography (`#d4af37`, `#f2d06b`), glassmorphism cards (`#0a0a0a`), Playfair Display & Montserrat fonts, and background texture overlays.
-
 
 ---
 
@@ -102,10 +100,8 @@ golden/
    ```
    Create `frontend/.env`:
    ```env
-   VITE_API_BASE_URL=/v1
+   VITE_API_BASE_URL=http://127.0.0.1:8000/v1
    ```
-   *(Requests to `/v1` are automatically proxied to `http://127.0.0.1:8000` via `vite.config.js` in development)*
-
 
 2. **Install Node Dependencies:**
    ```powershell
